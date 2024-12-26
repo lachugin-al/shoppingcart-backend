@@ -5,10 +5,22 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
+/**
+ * Тесты для проверки корректной сериализации и десериализации модели [Order].
+ */
 class OrderModelTest {
 
+    /**
+     * Тест проверяет, что JSON, содержащий данные о заказе, корректно десериализуется в объект [Order].
+     *
+     * Цели теста:
+     * 1. Убедиться, что поле даты `date_created` корректно преобразуется в объект [Instant].
+     * 2. Проверить корректность маппинга остальных полей объекта.
+     * 3. Убедиться, что вложенные объекты, такие как [Delivery], [Payment], [Item], также правильно десериализуются.
+     */
     @Test
     fun `should correctly deserialize Order JSON with Instant`() {
+        // Исходный JSON для теста
         val json = """
             {
                "order_uid": "test-01",
@@ -16,7 +28,7 @@ class OrderModelTest {
                "entry": "TEST",
                "delivery": {
                   "name": "Test Testov",
-                  "phone": "+9710000000",
+                  "phone": "+79110000000",
                   "zip": "2639802",
                   "city": "Saint Petersburg",
                   "address": "Moskovsaya 1",
@@ -61,19 +73,64 @@ class OrderModelTest {
             }
         """.trimIndent()
 
-        val jsonDecoder = Json { ignoreUnknownKeys = true }
+        // Десериализация JSON в объект Order
+        val jsonDecoder = Json { ignoreUnknownKeys = true } // Игнорируем неизвестные ключи в JSON
         val order: Order = jsonDecoder.decodeFromString(json)
 
-        // Проверка даты
+        // Проверка корректности преобразования поля даты
         val expectedDate = Instant.parse("2024-12-26T01:01:01Z")
-        assertEquals(expectedDate, order.dateCreated)
+        assertEquals(
+            expectedDate,
+            order.dateCreated,
+            "Поле dateCreated не соответствует ожидаемому значению"
+        )
 
-        // Проверка других полей
-        assertEquals("test-01", order.orderUid)
-        assertEquals("TRACKNUMBER1", order.trackNumber)
-        assertEquals("TEST", order.entry)
-        assertEquals("Test Testov", order.delivery.name)
-        assertEquals(1816, order.payment.amount)
-        assertEquals("Box", order.items.first().name)
+        // Проверка основных полей объекта Order
+        assertEquals(
+            "test-01",
+            order.orderUid,
+            "Поле orderUid не соответствует ожидаемому значению"
+        )
+        assertEquals(
+            "TRACKNUMBER1",
+            order.trackNumber,
+            "Поле trackNumber не соответствует ожидаемому значению"
+        )
+        assertEquals(
+            "TEST",
+            order.entry,
+            "Поле entry не соответствует ожидаемому значению"
+        )
+
+        // Проверка вложенного объекта Delivery
+        assertEquals(
+            "Test Testov",
+            order.delivery.name,
+            "Поле name объекта Delivery не соответствует ожидаемому значению"
+        )
+        assertEquals(
+            "+79110000000",
+            order.delivery.phone,
+            "Поле phone объекта Delivery не соответствует ожидаемому значению"
+        )
+
+        // Проверка вложенного объекта Payment
+        assertEquals(
+            1816,
+            order.payment.amount,
+            "Поле amount объекта Payment не соответствует ожидаемому значению"
+        )
+
+        // Проверка списка объектов Item
+        assertEquals(
+            "Box",
+            order.items.first().name,
+            "Поле name первого объекта Item не соответствует ожидаемому значению"
+        )
+        assertEquals(
+            1934910,
+            order.items.first().chrtId,
+            "Поле chrtId первого объекта Item не соответствует ожидаемому значению"
+        )
     }
 }

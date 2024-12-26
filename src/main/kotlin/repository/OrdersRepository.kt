@@ -38,7 +38,8 @@ interface OrdersRepository {
 class OrdersRepositoryImpl(
     private val connection: Connection,
     private val deliveryRepository: DeliveriesRepository,
-    private val paymentRepository: PaymentsRepository
+    private val paymentRepository: PaymentsRepository,
+    private val itemsRepository: ItemsRepository
 ) : OrdersRepository {
 
     /**
@@ -104,6 +105,8 @@ class OrdersRepositoryImpl(
         val payment = paymentRepository.getByOrderID(orderUid)
             ?: throw IllegalArgumentException("Payment not found for orderUID: $orderUid")
 
+        val items = itemsRepository.getByOrderID(orderUid)
+
         return Order(
             orderUid = orderUid,
             trackNumber = resultSet.getString("track_number"),
@@ -118,7 +121,7 @@ class OrdersRepositoryImpl(
             oofShard = resultSet.getString("oof_shard"),
             delivery = delivery,
             payment = payment,
-            items = listOf() // Здесь можно подключить загрузку items
+            items = items // Здесь можно подключить загрузку items
         )
     }
 }

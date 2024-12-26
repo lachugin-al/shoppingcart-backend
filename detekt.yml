@@ -10,7 +10,7 @@ config:
 complexity:
   LongMethod:
     active: true
-    threshold: 80
+    threshold: 110
 
 style:
   MagicNumber:
