@@ -48,19 +48,6 @@ class OrderModelTest {
                      "nm_id": 2389211,
                      "brand": "Boxoffice",
                      "status": 202
-                  },
-                  {
-                     "chrt_id": 1934911,
-                     "track_number": "TRACKNUMBER2",
-                     "price": 451,
-                     "rid": "test-a02",
-                     "name": "Box",
-                     "sale": 30,
-                     "size": "0",
-                     "total_price": 323,
-                     "nm_id": 2389211,
-                     "brand": "Boxoffice",
-                     "status": 202
                   }
                ],
                "locale": "en",
