@@ -2,6 +2,8 @@ package model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import util.InstantSerializer
+import java.time.Instant
 
 /**
  * Представляет информацию о доставке заказа.
@@ -69,6 +71,6 @@ data class Order(
     @SerialName("delivery_service") val deliveryService: String,
     @SerialName("shardkey") val shardkey: String,
     @SerialName("sm_id") val smId: Int,
-    @SerialName("date_created") val dateCreated: String,
+    @SerialName("date_created") @Serializable(with = InstantSerializer::class) val dateCreated: Instant,
     @SerialName("oof_shard") val oofShard: String
 )

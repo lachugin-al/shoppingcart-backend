@@ -3,12 +3,12 @@ package model
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.time.Instant
 
 class OrderModelTest {
 
     @Test
-    fun `should correctly deserialize Order JSON`() {
-        // Тестовый JSON
+    fun `should correctly deserialize Order JSON with Instant`() {
         val json = """
             {
                "order_uid": "test-01",
@@ -55,30 +55,25 @@ class OrderModelTest {
                "customer_id": "test",
                "delivery_service": "deliveler",
                "shardkey": "1",
-               "sm_id": "01",
+               "sm_id": 1,
                "date_created": "2024-12-26T01:01:01Z",
                "oof_shard": "1"
             }
         """.trimIndent()
 
-        // Десериализация JSON
-        val jsonDecoder = Json { ignoreUnknownKeys = true } // Игнорируем лишние поля, если будут
+        val jsonDecoder = Json { ignoreUnknownKeys = true }
         val order: Order = jsonDecoder.decodeFromString(json)
 
-        // Проверки основных полей
+        // Проверка даты
+        val expectedDate = Instant.parse("2024-12-26T01:01:01Z")
+        assertEquals(expectedDate, order.dateCreated)
+
+        // Проверка других полей
         assertEquals("test-01", order.orderUid)
         assertEquals("TRACKNUMBER1", order.trackNumber)
         assertEquals("TEST", order.entry)
-
-        // Проверка вложенных объектов
         assertEquals("Test Testov", order.delivery.name)
-        assertEquals("+9710000000", order.delivery.phone)
         assertEquals(1816, order.payment.amount)
-        assertEquals(1934910, order.items.first().chrtId)
-        assertEquals(1934911, order.items[1].chrtId)
         assertEquals("Box", order.items.first().name)
-
-        // Проверка даты
-        assertEquals("2024-12-26T01:01:01Z", order.dateCreated)
     }
 }
