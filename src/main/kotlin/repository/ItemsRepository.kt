@@ -46,23 +46,30 @@ class ItemsRepositoryImpl(private val connection: Connection) : ItemsRepository 
             INSERT INTO items (order_uid, chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            for (item in items) {
-                statement.setString(1, orderUID)
-                statement.setInt(2, item.chrtId)
-                statement.setString(3, item.trackNumber)
-                statement.setInt(4, item.price)
-                statement.setString(5, item.rid)
-                statement.setString(6, item.name)
-                statement.setInt(7, item.sale)
-                statement.setString(8, item.size)
-                statement.setInt(9, item.totalPrice)
-                statement.setInt(10, item.nmId)
-                statement.setString(11, item.brand)
-                statement.setInt(12, item.status)
-                statement.addBatch() // Добавляем в батч
+        try {
+            connection.prepareStatement(query).use { statement ->
+                for (item in items) {
+                    statement.setString(1, orderUID)
+                    statement.setInt(2, item.chrtId)
+                    statement.setString(3, item.trackNumber)
+                    statement.setInt(4, item.price)
+                    statement.setString(5, item.rid)
+                    statement.setString(6, item.name)
+                    statement.setInt(7, item.sale)
+                    statement.setString(8, item.size)
+                    statement.setInt(9, item.totalPrice)
+                    statement.setInt(10, item.nmId)
+                    statement.setString(11, item.brand)
+                    statement.setInt(12, item.status)
+                    statement.addBatch() // Добавляем в батч
+                }
+                statement.executeBatch() // Выполняем все запросы батчем
             }
-            statement.executeBatch() // Выполняем все запросы батчем
+        } catch (e: SQLException) {
+            throw SQLException(
+                "Error inserting items for Order UID: $orderUID. Items: ${items.joinToString(", ") { it.toString() }}",
+                e
+            )
         }
     }
 
@@ -74,10 +81,14 @@ class ItemsRepositoryImpl(private val connection: Connection) : ItemsRepository 
             SELECT chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status
             FROM items WHERE order_uid = ?
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            statement.setString(1, orderUID)
-            val resultSet = statement.executeQuery()
-            return mapResultSetToItems(resultSet)
+        try {
+            connection.prepareStatement(query).use { statement ->
+                statement.setString(1, orderUID)
+                val resultSet = statement.executeQuery()
+                return mapResultSetToItems(resultSet)
+            }
+        } catch (e: SQLException) {
+            throw SQLException("Error fetching items for Order UID: $orderUID", e)
         }
     }
 

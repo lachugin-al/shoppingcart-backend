@@ -45,16 +45,23 @@ class DeliveriesRepositoryImpl(private val connection: Connection) : DeliveriesR
             INSERT INTO deliveries (order_uid, name, phone, zip, city, address, region, email)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            statement.setString(1, orderUID)
-            statement.setString(2, delivery.name)
-            statement.setString(3, delivery.phone)
-            statement.setString(4, delivery.zip)
-            statement.setString(5, delivery.city)
-            statement.setString(6, delivery.address)
-            statement.setString(7, delivery.region)
-            statement.setString(8, delivery.email)
-            statement.executeUpdate()
+        try {
+            connection.prepareStatement(query).use { statement ->
+                statement.setString(1, orderUID)
+                statement.setString(2, delivery.name)
+                statement.setString(3, delivery.phone)
+                statement.setString(4, delivery.zip)
+                statement.setString(5, delivery.city)
+                statement.setString(6, delivery.address)
+                statement.setString(7, delivery.region)
+                statement.setString(8, delivery.email)
+                statement.executeUpdate()
+            }
+        } catch (e: SQLException) {
+            throw SQLException(
+                "Error inserting delivery into 'deliveries' table. Order UID: $orderUID, Delivery details: ${delivery.toString()}",
+                e
+            )
         }
     }
 
@@ -66,14 +73,18 @@ class DeliveriesRepositoryImpl(private val connection: Connection) : DeliveriesR
             SELECT name, phone, zip, city, address, region, email
             FROM deliveries WHERE order_uid = ?
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            statement.setString(1, orderUID)
-            val resultSet = statement.executeQuery()
-            return if (resultSet.next()) {
-                mapRowToDelivery(resultSet)
-            } else {
-                null
+        try {
+            connection.prepareStatement(query).use { statement ->
+                statement.setString(1, orderUID)
+                val resultSet = statement.executeQuery()
+                return if (resultSet.next()) {
+                    mapRowToDelivery(resultSet)
+                } else {
+                    null
+                }
             }
+        } catch (e: SQLException) {
+            throw SQLException("Error fetching delivery with Order UID: $orderUID", e)
         }
     }
 

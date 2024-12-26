@@ -46,19 +46,26 @@ class PaymentsRepositoryImpl(private val connection: Connection) : PaymentsRepos
             INSERT INTO payments (order_uid, transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            statement.setString(1, orderUID)
-            statement.setString(2, payment.transaction)
-            statement.setString(3, payment.requestId)
-            statement.setString(4, payment.currency)
-            statement.setString(5, payment.provider)
-            statement.setInt(6, payment.amount)
-            statement.setLong(7, payment.paymentDt)
-            statement.setString(8, payment.bank)
-            statement.setInt(9, payment.deliveryCost)
-            statement.setInt(10, payment.goodsTotal)
-            statement.setInt(11, payment.customFee)
-            statement.executeUpdate()
+        try {
+            connection.prepareStatement(query).use { statement ->
+                statement.setString(1, orderUID)
+                statement.setString(2, payment.transaction)
+                statement.setString(3, payment.requestId)
+                statement.setString(4, payment.currency)
+                statement.setString(5, payment.provider)
+                statement.setInt(6, payment.amount)
+                statement.setLong(7, payment.paymentDt)
+                statement.setString(8, payment.bank)
+                statement.setInt(9, payment.deliveryCost)
+                statement.setInt(10, payment.goodsTotal)
+                statement.setInt(11, payment.customFee)
+                statement.executeUpdate()
+            }
+        } catch (e: SQLException) {
+            throw SQLException(
+                "Error inserting payment for Order UID: $orderUID. Payment details: ${payment.toString()}",
+                e
+            )
         }
     }
 
@@ -70,14 +77,18 @@ class PaymentsRepositoryImpl(private val connection: Connection) : PaymentsRepos
             SELECT transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee
             FROM payments WHERE order_uid = ?
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            statement.setString(1, orderUID)
-            val resultSet = statement.executeQuery()
-            return if (resultSet.next()) {
-                mapRowToPayment(resultSet)
-            } else {
-                null
+        try {
+            connection.prepareStatement(query).use { statement ->
+                statement.setString(1, orderUID)
+                val resultSet = statement.executeQuery()
+                return if (resultSet.next()) {
+                    mapRowToPayment(resultSet)
+                } else {
+                    null
+                }
             }
+        } catch (e: SQLException) {
+            throw SQLException("Error fetching payment for Order UID: $orderUID", e)
         }
     }
 

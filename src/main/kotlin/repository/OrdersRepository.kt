@@ -49,19 +49,23 @@ class OrdersRepositoryImpl(
             INSERT INTO orders (order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            statement.setString(1, order.orderUid)
-            statement.setString(2, order.trackNumber)
-            statement.setString(3, order.entry)
-            statement.setString(4, order.locale)
-            statement.setString(5, order.internalSignature)
-            statement.setString(6, order.customerId)
-            statement.setString(7, order.deliveryService)
-            statement.setString(8, order.shardkey)
-            statement.setInt(9, order.smId)
-            statement.setTimestamp(10, java.sql.Timestamp.from(order.dateCreated))
-            statement.setString(11, order.oofShard)
-            statement.executeUpdate()
+        try {
+            connection.prepareStatement(query).use { statement ->
+                statement.setString(1, order.orderUid)
+                statement.setString(2, order.trackNumber)
+                statement.setString(3, order.entry)
+                statement.setString(4, order.locale)
+                statement.setString(5, order.internalSignature)
+                statement.setString(6, order.customerId)
+                statement.setString(7, order.deliveryService)
+                statement.setString(8, order.shardkey)
+                statement.setInt(9, order.smId)
+                statement.setTimestamp(10, java.sql.Timestamp.from(order.dateCreated))
+                statement.setString(11, order.oofShard)
+                statement.executeUpdate()
+            }
+        } catch (e: SQLException) {
+            throw SQLException("Error inserting order with UID: ${order.orderUid}", e)
         }
     }
 
@@ -73,14 +77,18 @@ class OrdersRepositoryImpl(
             SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
             FROM orders WHERE order_uid = ?
         """.trimIndent()
-        connection.prepareStatement(query).use { statement ->
-            statement.setString(1, orderUID)
-            val resultSet = statement.executeQuery()
-            return if (resultSet.next()) {
-                mapRowToOrder(resultSet)
-            } else {
-                null
+        try {
+            connection.prepareStatement(query).use { statement ->
+                statement.setString(1, orderUID)
+                val resultSet = statement.executeQuery()
+                return if (resultSet.next()) {
+                    mapRowToOrder(resultSet)
+                } else {
+                    null
+                }
             }
+        } catch (e: SQLException) {
+            throw SQLException("Error fetching order with UID: $orderUID", e)
         }
     }
 
