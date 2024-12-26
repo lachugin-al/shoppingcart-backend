@@ -59,7 +59,8 @@ class DeliveriesRepositoryImpl(private val connection: Connection) : DeliveriesR
             }
         } catch (e: SQLException) {
             throw SQLException(
-                "Error inserting delivery into 'deliveries' table. Order UID: $orderUID, Delivery details: ${delivery.toString()}",
+                "Error inserting delivery into 'deliveries' table. Order UID: $orderUID," +
+                        " Delivery details: ${delivery.toString()}",
                 e
             )
         }
