@@ -13,6 +13,10 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.5.0")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation("ch.qos.logback:logback-classic:1.5.15")
 
     testImplementation(kotlin("test"))
     testImplementation("org.mockito:mockito-core:5.14.2")
