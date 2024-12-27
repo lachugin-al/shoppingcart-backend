@@ -2,9 +2,12 @@ package service
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import model.*
+import model.Order
 import mu.KotlinLogging
-import repository.*
+import repository.DeliveriesRepository
+import repository.ItemsRepository
+import repository.PaymentsRepository
+import repository.OrdersRepository
 import java.sql.Connection
 import java.time.Instant
 
@@ -36,7 +39,9 @@ class OrderServiceImpl(
         // Проверяем обязательные поля
         require(order.orderUid.isNotBlank()) { "orderUid cannot be empty" }
         require(order.items.isNotEmpty()) { "Order must contain at least one product" }
-        require(order.delivery.name.isNotBlank() && order.delivery.phone.isNotBlank()) { "Delivery must contain a name and phone number" }
+        require(
+            order.delivery.name.isNotBlank() && order.delivery.phone.isNotBlank()
+        ) { "Delivery must contain a name and phone number" }
 
         // Устанавливаем текущее время для dateCreated, если оно не указано
         val orderToSave = if (order.dateCreated == Instant.EPOCH) {
