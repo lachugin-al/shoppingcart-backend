@@ -17,6 +17,13 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.0")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("ch.qos.logback:logback-classic:1.5.15")
+    implementation("org.apache.kafka:kafka-clients:3.9.0")
+    implementation("org.postgresql:postgresql:42.7.4")
+
+    // HttpServer
+    implementation("io.vertx:vertx-core:4.5.11")
+    implementation("io.vertx:vertx-web:4.5.11")
+    implementation("io.vertx:vertx-lang-kotlin-coroutines:4.5.11")
 
     testImplementation(kotlin("test"))
     testImplementation("org.mockito:mockito-core:5.14.2")
