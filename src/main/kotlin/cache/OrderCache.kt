@@ -141,4 +141,9 @@ class OrderCache {
             items = items
         )
     }
+
+    // Возвращает количество заказов в кэше
+    fun size(): Int {
+        return cache.size
+    }
 }

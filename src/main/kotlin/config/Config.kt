@@ -16,7 +16,7 @@ data class Config(
     val kafkaTopic: String,        // Топик Kafka для обработки заказов
     val kafkaGroupId: String,      // Группа потребителей Kafka
 
-    val httpPort: String,          // Порт HTTP-сервера
+    val httpPort: Int,          // Порт HTTP-сервера
 
     val shutdownTimeout: Duration  // Таймаут завершения работы приложения
 )

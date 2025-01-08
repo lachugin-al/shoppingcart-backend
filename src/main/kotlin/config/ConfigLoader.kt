@@ -32,7 +32,7 @@ object ConfigLoader {
             kafkaTopic = getEnvOrThrow("KAFKA_TOPIC"),
             kafkaGroupId = getEnvOrThrow("KAFKA_GROUP_ID"),
 
-            httpPort = getEnvOrThrow("HTTP_PORT"),
+            httpPort = getEnvOrThrow("HTTP_PORT").toIntOrThrow("HTTP_PORT"),
 
             shutdownTimeout = Duration.parse("PT${getEnvOrThrow("SHUTDOWN_TIMEOUT")}")
         )
