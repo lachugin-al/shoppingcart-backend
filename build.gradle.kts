@@ -34,6 +34,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(21)
 }
@@ -45,11 +46,10 @@ detekt {
     allRules = false // Включаем только необходимые правила
 }
 
-// TODO добавить для CI
-//tasks.withType<io.gitlab.arturbosch.detekt.Detekt> {
-//    reports {
-//        html.required.set(true) // Отчет в HTML
-//        xml.required.set(true)  // Отчет в XML
-//        txt.required.set(false) // Текстовый отчет не нужен
-//    }
-//}
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt> {
+    reports {
+        html.required.set(true) // Отчет в HTML
+        xml.required.set(true)  // Отчет в XML
+        txt.required.set(false) // Текстовый отчет не нужен
+    }
+}

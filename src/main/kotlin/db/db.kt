@@ -24,6 +24,7 @@ suspend fun initDB(config: Config): Connection {
             "?user=${config.dbUser}&password=${config.dbPassword}"
 
     return withContext(Dispatchers.IO) {
+        @Suppress("TooGenericExceptionCaught")
         try {
             // Установление соединения
             val connection = DriverManager.getConnection(dsn)
@@ -50,6 +51,7 @@ private suspend fun runMigrations(connection: Connection) {
     val migrationsDir = "src/main/resources/migrations"
 
     withContext(Dispatchers.IO) {
+        @Suppress("TooGenericExceptionCaught")
         try {
             // Чтение SQL-файлов из директории миграций
             val files = Files.newDirectoryStream(Paths.get(migrationsDir), "*.sql").toList()

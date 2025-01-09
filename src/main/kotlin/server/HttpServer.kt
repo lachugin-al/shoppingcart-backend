@@ -25,7 +25,7 @@ class HttpServer(
     private val staticDir: String
 ) {
 
-    private val httpServer: HttpServer = HttpServer.create(InetSocketAddress(port), 0).apply {
+    private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0).apply {
         executor = Executors.newFixedThreadPool(16)
         createContext("/order/") { exchange -> handleGetOrderByID(exchange) }
         createContext("/") { exchange -> handleStatic(exchange) }
@@ -43,7 +43,7 @@ class HttpServer(
      */
     fun start() {
         logger.info { "HTTP server is starting" }
-        httpServer.start()
+        server.start()
     }
 
     /**
@@ -53,7 +53,7 @@ class HttpServer(
      */
     fun stop(delay: Int = 0) {
         logger.info { "HTTP server is stopping" }
-        httpServer.stop(delay)
+        server.stop(delay)
         logger.info { "HTTP server stopped" }
     }
 
@@ -61,6 +61,7 @@ class HttpServer(
      * Обрабатывает запросы на получение заказа по ID.
      */
     private fun handleGetOrderByID(exchange: HttpExchange) {
+        @Suppress("TooGenericExceptionCaught")
         with(exchange) {
             try {
                 if (requestMethod != "GET") {
@@ -94,6 +95,7 @@ class HttpServer(
      */
     private fun handleStatic(exchange: HttpExchange) {
         with(exchange) {
+            @Suppress("TooGenericExceptionCaught")
             try {
                 val filePath = if (requestURI.path == "/") "index.html" else requestURI.path.removePrefix("/")
                 val file = File(staticDir, filePath)

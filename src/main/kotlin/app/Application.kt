@@ -4,9 +4,21 @@ import cache.OrderCache
 import config.ConfigLoader
 import db.initDB
 import kafka.KafkaConsumerService
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.cancelAndJoin
 import mu.KotlinLogging
-import repository.*
+import repository.DeliveriesRepositoryImpl
+import repository.PaymentsRepositoryImpl
+import repository.ItemsRepositoryImpl
+import repository.OrdersRepositoryImpl
 import server.HttpServer
 import service.OrderServiceImpl
 import kotlin.system.exitProcess
@@ -36,6 +48,7 @@ fun main() = runBlocking {
         }
     })
 
+    @Suppress("TooGenericExceptionCaught")
     try {
         // Инициализация БД
         val database = initDB(config)

@@ -39,8 +39,14 @@ class KafkaConsumerService(
         val props = Properties().apply {
             put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers.joinToString(","))
             put(ConsumerConfig.GROUP_ID_CONFIG, groupId)
-            put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
+            put(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringDeserializer"
+            )
+            put(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                "org.apache.kafka.common.serialization.StringDeserializer"
+            )
             put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest") // Начинаем с первого сообщения
         }
         consumer = KafkaConsumer(props)
@@ -56,6 +62,7 @@ class KafkaConsumerService(
      */
     suspend fun run() = withContext(Dispatchers.IO) {
         logger.info { "Kafka consumer started" }
+        @Suppress("TooGenericExceptionCaught")
         try {
             while (true) {
                 // Получаем записи из Kafka-топика

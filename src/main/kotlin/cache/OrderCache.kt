@@ -38,6 +38,7 @@ class OrderCache {
     ) {
         logger.info { "Starting to load orders into cache" }
 
+        @Suppress("TooGenericExceptionCaught")
         try {
             // Получаем все идентификаторы заказов
             val orderUIDs = getAllOrderUIDs(connection)

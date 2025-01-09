@@ -54,6 +54,7 @@ class OrderServiceImpl(
         withContext(Dispatchers.IO) {
             connection.use { conn ->
                 conn.autoCommit = false
+                @Suppress("TooGenericExceptionCaught")
                 try {
                     // Сохраняем заказ
                     ordersRepo.insert(orderToSave)
