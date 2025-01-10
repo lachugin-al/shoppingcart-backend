@@ -20,6 +20,8 @@ dependencies {
     implementation("org.apache.kafka:kafka-clients:3.9.0")
     implementation("org.postgresql:postgresql:42.7.4")
 
+    implementation("io.github.serpro69:kotlin-faker:1.16.0")
+
     // HttpServer
     implementation("io.vertx:vertx-core:4.5.11")
     implementation("io.vertx:vertx-web:4.5.11")

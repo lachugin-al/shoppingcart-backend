@@ -147,4 +147,15 @@ class OrderCache {
     fun size(): Int {
         return cache.size
     }
+
+    /**
+     * Возвращает список всех заказов из кэша.
+     *
+     * @return Список объектов [Order].
+     */
+    fun getAll(): List<Order> {
+        return cache.values.toList().also {
+            logger.debug { "Retrieved ${it.size} orders from cache" }
+        }
+    }
 }

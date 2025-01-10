@@ -4,6 +4,7 @@ import cache.OrderCache
 import config.ConfigLoader
 import db.initDB
 import kafka.KafkaConsumerService
+import kafka.KafkaProducerService
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Dispatchers
@@ -85,6 +86,9 @@ fun main() = runBlocking {
             itemsRepo = itemsRepo
         )
 
+        // Инициализация Kafka Producer
+        val kafkaProducer = KafkaProducerService(config)
+
         // Запуск Kafka-консьюмера
         val kafkaConsumerService = KafkaConsumerService(
             brokers = config.kafkaBrokers,
@@ -107,7 +111,8 @@ fun main() = runBlocking {
         val httpServer = HttpServer(
             port = config.httpPort,
             orderCache = orderCache,
-            staticDir = "src/main/resources/web"
+            staticDir = "src/main/resources/web",
+            kafkaProducer = kafkaProducer
         )
 
         val httpServerJob = applicationScope.launch {

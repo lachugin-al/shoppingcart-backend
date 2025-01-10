@@ -7,8 +7,11 @@ import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
+import kafka.KafkaProducerService
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import model.Order
+import util.OrderTestDataGenerator
 
 private val logger = KotlinLogging.logger {}
 
@@ -18,16 +21,20 @@ private val logger = KotlinLogging.logger {}
  * @param port порт для запуска сервера.
  * @param orderCache кэш для доступа к заказам.
  * @param staticDir директория для статических файлов (например, index.html).
+ * @param kafkaProducer KafkaProducerService для отправки сообщений в Kafka.
  */
 class HttpServer(
     private val port: Int,
     private val orderCache: OrderCache,
-    private val staticDir: String
+    private val staticDir: String,
+    private val kafkaProducer: KafkaProducerService
 ) {
 
     private val server: HttpServer = HttpServer.create(InetSocketAddress(port), 0).apply {
         executor = Executors.newFixedThreadPool(16)
         createContext("/order/") { exchange -> handleGetOrderByID(exchange) }
+        createContext("/api/send-test-order") { exchange -> handleSendTestOrder(exchange) }
+        createContext("/api/orders") { exchange -> handleGetOrders(exchange) }
         createContext("/") { exchange -> handleStatic(exchange) }
     }
 
@@ -85,6 +92,53 @@ class HttpServer(
                 sendResponse(order.toJson(), 200, "application/json")
             } catch (e: Exception) {
                 logger.error(e) { "Failed to process order request" }
+                sendResponse("Internal Server Error", 500)
+            }
+        }
+    }
+
+    /**
+     * Обрабатывает запросы на получение списка заказов.
+     */
+    private fun handleGetOrders(exchange: HttpExchange) {
+        with(exchange) {
+            try {
+                if (requestMethod != "GET") {
+                    sendResponse("Method Not Allowed", 405)
+                    return
+                }
+
+                val ordersList = orderCache.getAll() // Предполагается, что метод `getAll()` возвращает список заказов.
+                sendResponse(Json.encodeToString(ordersList), 200, "application/json")
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to fetch orders" }
+                sendResponse("Internal Server Error", 500)
+            }
+        }
+    }
+
+    /**
+     * Обрабатывает запросы на отправку тестового заказа.
+     */
+    private fun handleSendTestOrder(exchange: HttpExchange) {
+        with(exchange) {
+            try {
+                if (requestMethod != "POST") {
+                    sendResponse("Method Not Allowed", 405)
+                    return
+                }
+
+                // Генерация тестового заказа
+                val testOrder: Order = OrderTestDataGenerator.generateOrder()
+                logger.info { "Generated test order: ${testOrder.orderUid}" }
+
+                // Отправка заказа через KafkaProducerService
+                kafkaProducer.sendOrder(testOrder)
+                logger.info { "Test order sent to Kafka: ${testOrder.orderUid}" }
+
+                sendResponse("Test order sent successfully", 200)
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to send test order" }
                 sendResponse("Internal Server Error", 500)
             }
         }
