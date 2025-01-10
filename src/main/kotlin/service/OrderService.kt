@@ -52,30 +52,28 @@ class OrderServiceImpl(
 
         // Выполняем сохранение данных в транзакции
         withContext(Dispatchers.IO) {
-            connection.use { conn ->
-                conn.autoCommit = false
-                @Suppress("TooGenericExceptionCaught")
-                try {
-                    // Сохраняем заказ
-                    ordersRepo.insert(orderToSave)
+            connection.autoCommit = false
+            @Suppress("TooGenericExceptionCaught")
+            try {
+                // Сохраняем заказ
+                ordersRepo.insert(orderToSave)
 
-                    // Сохраняем доставку
-                    deliveriesRepo.insert(orderToSave.delivery, orderToSave.orderUid)
+                // Сохраняем доставку
+                deliveriesRepo.insert(orderToSave.delivery, orderToSave.orderUid)
 
-                    // Сохраняем платеж
-                    paymentsRepo.insert(orderToSave.payment, orderToSave.orderUid)
+                // Сохраняем платеж
+                paymentsRepo.insert(orderToSave.payment, orderToSave.orderUid)
 
-                    // Сохраняем товары
-                    itemsRepo.insert(orderToSave.items, orderToSave.orderUid)
+                // Сохраняем товары
+                itemsRepo.insert(orderToSave.items, orderToSave.orderUid)
 
-                    // Подтверждаем транзакцию
-                    conn.commit()
-                    logger.info { "Order ${orderToSave.orderUid} saved successfully" }
-                } catch (e: Exception) {
-                    conn.rollback()
-                    logger.error(e) { "Order saving error ${orderToSave.orderUid}" }
-                    throw e
-                }
+                // Подтверждаем транзакцию
+                connection.commit()
+                logger.info { "Order ${orderToSave.orderUid} saved successfully" }
+            } catch (e: Exception) {
+                connection.rollback()
+                logger.error(e) { "Order saving error ${orderToSave.orderUid}" }
+                throw e
             }
         }
     }
