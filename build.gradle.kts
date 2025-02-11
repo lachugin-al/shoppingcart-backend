@@ -23,15 +23,21 @@ dependencies {
     implementation("io.github.serpro69:kotlin-faker:1.16.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
 
-    // HttpServer
+    // Vertx
     implementation("io.vertx:vertx-core:4.5.11")
     implementation("io.vertx:vertx-web:4.5.11")
     implementation("io.vertx:vertx-lang-kotlin-coroutines:4.5.11")
+    // Ktor
+    implementation("io.ktor:ktor-server-core:3.0.3")
+    implementation("io.ktor:ktor-server-netty:3.0.3")
+    implementation("io.ktor:ktor-server-content-negotiation:3.0.3")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.3")
 
     testImplementation(kotlin("test"))
     testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testImplementation("io.ktor:ktor-server-tests:3.0.3")
 }
 
 tasks.test {
