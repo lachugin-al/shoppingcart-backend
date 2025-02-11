@@ -21,6 +21,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.4")
 
     implementation("io.github.serpro69:kotlin-faker:1.16.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
 
     // HttpServer
     implementation("io.vertx:vertx-core:4.5.11")
